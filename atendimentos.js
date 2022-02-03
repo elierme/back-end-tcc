@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const app = express()
 const AWS = require('aws-sdk');
+const { randomUUID } = require('crypto'); 
 
 
 const TABLE = process.env.ATENDIMENTOS_TABLE;
@@ -38,42 +39,57 @@ app.get('/atendimentos', function (req, res) {
 })
 
 
+async function getTable(id, table){
+  try {
+      var params = {
+          KeyConditionExpression: 'id = :id',
+          ExpressionAttributeValues: {
+              ':id': id
+          },
+          TableName: table
+      };
+      var result = await dynamoDb.query(params).promise()
+      console.log(JSON.stringify(result))
+      return result;
+  } catch (error) {
+      console.error(error);
+  }
+}
 
-// Create associado endpoint
-app.post('/atendimentos', function (req, res) {
-  const { id } = req.body;
+// Create atendimentos endpoint
+app.post('/atendimentos', async function (req, res) {
+  const { data, idAssociado, idConveniado, idPrestador, valor } = req.body;
+  const id = randomUUID();
+
+  const associado = await getTable(idAssociado, process.env.ASSOCIADOS_TABLE);
+  const conveniado = await getTable(idConveniado, process.env.CONVENIADOS_TABLE);
+  const prestador = await getTable(idPrestador, process.env.PRESTADORES_TABLE);
 
   const params = {
     TableName: TABLE,
-    Item: req.body,
+    Item: {
+      id : id,
+      data: data, 
+      idAssociado: idAssociado, 
+      nameAssociado: associado.Items[0].nome,
+      idConveniado:idConveniado,
+      nameConveniado: conveniado.Items[0].nomeFantasia,
+      idPrestador:idPrestador,
+      namePrestador: prestador.Items[0].nome,
+      idPlano: associado.Items[0].planoId,
+      planoName: associado.Items[0].planoName,
+      valor: valor
+    },
   };
 
-  dynamoDb.put(params, (error) => {
+  dynamoDb.put(params, (error, data) => {
     if (error) {
       console.log(error);
-      res.status(422).json({ error: 'Não foi possivel criar associado', detail: error });
+      res.status(422).json({ error: 'Não foi possivel criar atendimentos', detail: error });
     }
-    res.status(201).json({ id });
+    res.status(201).json({ data });
   });
 })
 
-
-// Create associado endpoint
-app.put('/atendimentos', function (req, res) {
-  const { id } = req.body;
-
-  const params = {
-    TableName: TABLE,
-    Item: req.body,
-  };
-
-  dynamoDb.put(params, (error) => {
-    if (error) {
-      console.log(error);
-      res.status(422).json({ error: 'Não foi possivel criar associado', detail: error });
-    }
-    res.status(201).json({ id });
-  });
-})
 
 module.exports.handler = serverless(app);

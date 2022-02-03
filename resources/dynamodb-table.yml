@@ -9,7 +9,7 @@ Resources:
         AttributeDefinitions:
           -
             AttributeName: id
-            AttributeType: N
+            AttributeType: S
           -   
             AttributeName: cpf
             AttributeType: S 
@@ -30,7 +30,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: id
-          AttributeType: N
+          AttributeType: S
         -   
           AttributeName: data
           AttributeType: S 
@@ -51,7 +51,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: id
-          AttributeType: N
+          AttributeType: S
         -   
           AttributeName: data
           AttributeType: S 
@@ -72,7 +72,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: id
-          AttributeType: N
+          AttributeType: S
         -   
           AttributeName: cnpj
           AttributeType: S 
@@ -93,7 +93,7 @@ Resources:
       AttributeDefinitions:
         -
           AttributeName: id
-          AttributeType: N
+          AttributeType: S
         -   
           AttributeName: cpf
           AttributeType: S 

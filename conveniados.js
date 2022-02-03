@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const app = express()
 const AWS = require('aws-sdk');
+const { randomUUID } = require('crypto'); 
 
 
 const TABLE = process.env.CONVENIADOS_TABLE;
@@ -39,22 +40,60 @@ app.get('/conveniados', function (req, res) {
 
 
 
-// Create associado endpoint
+// Create conveniados endpoint
 app.post('/conveniados', function (req, res) {
-  const { id } = req.body;
+  const { nomeFantasia, razaoSocial, endereco, cnpj, telefone } = req.body;
+  const id = randomUUID();
 
   const params = {
     TableName: TABLE,
-    Item: req.body,
+    Item: {
+      id : id,
+      nomeFantasia: nomeFantasia, 
+      razaoSocial: razaoSocial, 
+      endereco: endereco, 
+      cnpj: cnpj, 
+      telefone:telefone, 
+      telefone: telefone
+    },
   };
 
-  dynamoDb.put(params, (error) => {
+  dynamoDb.put(params, (error, data) => {
     if (error) {
       console.log(error);
-      res.status(422).json({ error: 'Não foi possivel criar associado', detail: error });
+      res.status(422).json({ error: 'Não foi possivel criar conveniados', detail: error });
     }
-    res.status(201).json({ id });
+    res.status(201).json({ data });
   });
 })
+
+
+app.put('/conveniados/:id', function (req, res) {
+  const { nomeFantasia, razaoSocial, endereco, cnpj, telefone } = req.body;
+  const id = req.params.id;
+
+  const params = {
+    TableName: TABLE,
+    Item: {
+      id : id,
+      nomeFantasia: nomeFantasia, 
+      razaoSocial: razaoSocial, 
+      endereco: endereco, 
+      cnpj: cnpj, 
+      telefone:telefone, 
+      telefone: telefone
+    },
+  };
+
+  dynamoDb.put(params, (error, data) => {
+    if (error) {
+      console.log(error);
+      res.status(422).json({ error: 'Não foi possivel criar conveniados', detail: error });
+    }
+    res.status(201).json({ data });
+  });
+})
+
+
 
 module.exports.handler = serverless(app);

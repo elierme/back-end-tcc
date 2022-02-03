@@ -59,7 +59,7 @@ provider:
   lambdaHashingVersion: 20200924
   name: aws
   runtime: nodejs14.x
-  stage: dev
+  stage: homo
   region: us-west-2
   iamRoleStatements:
     - Effect: Allow
@@ -94,6 +94,10 @@ functions:
     handler: associados.handler
     events:
       - http: 'GET /associados'
+  getAssociado:
+    handler: associados.handler
+    events:
+      - http: 'GET /associados/{cpf}'
   createAgendamentos:
     handler: agendamentos.handler
     events:
@@ -118,6 +122,10 @@ functions:
     handler: conveniados.handler
     events:
       - http: 'GET /conveniados'
+  listAgendamentosOfConveniados:
+    handler: agendamentos.handler
+    events:
+      - http: 'GET /conveniados/{id}/agendamentos'
   createPrestadores:
     handler: prestadores.handler
     events:
