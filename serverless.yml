@@ -1,0 +1,133 @@
+# serverless.yml
+
+service: gisa-api
+
+custom:
+  associadosTableName: '${self:service}-${self:provider.stage}-associados'
+  associadosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.associadosTableName}
+  agendamentosTableName: '${self:service}-${self:provider.stage}-agendamentos'
+  agendamentosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.agendamentosTableName}
+  atendimentosTableName: '${self:service}-${self:provider.stage}-atendimentos'
+  atendimentosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.atendimentosTableName}
+  conveniadosTableName: '${self:service}-${self:provider.stage}-conveniados'
+  conveniadosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.conveniadosTableName}
+  prestadoresTableName: '${self:service}-${self:provider.stage}-prestadores'
+  prestadoresTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.prestadoresTableName}
+  
+
+provider:
+  lambdaHashingVersion: 20200924
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - ${self:custom.associadosTableArn}       
+        - ${self:custom.agendamentosTableArn}
+        - ${self:custom.atendimentosTableArn}
+        - ${self:custom.conveniadosTableArn}
+        - ${self:custom.prestadoresTableArn}
+  environment:
+    ASSOCIADOS_TABLE: ${self:custom.associadosTableName}  
+    AGENDAMENTOS_TABLE: ${self:custom.agendamentosTableName}
+    ATENDIMENTOS_TABLE: ${self:custom.atendimentosTableName}
+    CONVENIADOS_TABLE: ${self:custom.conveniadosTableName}
+    PRESTADORES_TABLE: ${self:custom.prestadoresTableName}
+
+
+
+functions:
+  createAssociado:
+    handler: associados.handler
+    events:
+      - http: 'POST /associados'
+  listAssociados:
+    handler: associados.handler
+    events:
+      - http: 'GET /associados'
+  createAgendamentos:
+    handler: agendamentos.handler
+    events:
+      - http: 'POST /agendamentos'
+  listAgendamentos:
+    handler: agendamentos.handler
+    events:
+      - http: 'GET /agendamentos'
+  createAtendimentos:
+    handler: atendimentos.handler
+    events:
+      - http: 'POST /atendimentos'
+  listAtendimentos:
+    handler: atendimentos.handler
+    events:
+      - http: 'GET /atendimentos'
+  createConveniados:
+    handler: conveniados.handler
+    events:
+      - http: 'POST /conveniados'
+  listConveniados:
+    handler: conveniados.handler
+    events:
+      - http: 'GET /conveniados'
+  createPrestadores:
+    handler: prestadores.handler
+    events:
+      - http: 'POST /prestadores'
+  listPrestadores:
+    handler: prestadores.handler
+    events:
+      - http: 'GET /prestadores'
+  
+
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}

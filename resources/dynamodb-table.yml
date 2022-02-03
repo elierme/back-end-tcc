@@ -1,0 +1,106 @@
+Resources:
+  AssociadosTable:
+      Type: 'AWS::DynamoDB::Table'            
+      Properties:
+        TableName: ${self:custom.associadosTableName}
+        ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1  
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: N
+          -   
+            AttributeName: cpf
+            AttributeType: S 
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+          -      
+            AttributeName: cpf
+            KeyType: RANGE
+  AgendamentosTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.agendamentosTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: N
+        -   
+          AttributeName: data
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: data
+          KeyType: RANGE
+  AtendimentosTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.atendimentosTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: N
+        -   
+          AttributeName: data
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: data
+          KeyType: RANGE
+  ConveniadosTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.conveniadosTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: N
+        -   
+          AttributeName: cnpj
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: cnpj
+          KeyType: RANGE
+  PrestadoresTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.prestadoresTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: N
+        -   
+          AttributeName: cpf
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: cpf
+          KeyType: RANGE
