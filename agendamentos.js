@@ -57,7 +57,7 @@ async function getTable(id, table){
 
 // Create atendimentos endpoint
 app.post('/agendamentos', async function (req, res) {
-  const { data, idAssociado, idConveniado, idPrestador, valor } = req.body;
+  const { data, idAssociado, idConveniado, idPrestador } = req.body;
   const id = randomUUID();
 
   const associado = await getTable(idAssociado, process.env.ASSOCIADOS_TABLE);
@@ -69,6 +69,7 @@ app.post('/agendamentos', async function (req, res) {
     Item: {
       id : id,
       data: data, 
+      procedimento: procedimento,
       idAssociado: idAssociado, 
       nameAssociado: associado.Items[0].nome,
       idConveniado:idConveniado,
@@ -123,7 +124,7 @@ app.get('/conveniados/:id/agendamentos', function (req, res) {
 
 
 // Obter agendamentos endpoint
-app.get('/prestadores/:id/atendimentos', function (req, res) {
+app.get('/prestadores/:id/agendamentos', function (req, res) {
   
   const params = {
     TableName: TABLE,

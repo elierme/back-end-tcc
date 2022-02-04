@@ -39,10 +39,30 @@ app.get('/prestadores', function (req, res) {
 })
 
 
+async function getTable(id, table){
+  try {
+      var params = {
+          KeyConditionExpression: 'id = :id',
+          ExpressionAttributeValues: {
+              ':id': id
+          },
+          TableName: table
+      };
+      var result = await dynamoDb.query(params).promise()
+      console.log(JSON.stringify(result))
+      return result;
+  } catch (error) {
+      console.error(error);
+  }
+}
+
+
 // Create associado endpoint
 app.post('/prestadores', function (req, res) {
-  const { nome, endereco, planoName, cpf, telefone, rg, dataNascimento } = req.body;
+  const { nome, endereco, planoName, cpf, telefone, rg, dataNascimento, idConveniado} = req.body;
   const id = randomUUID();
+
+  const conveniado = await getTable(idConveniado, process.env.CONVENIADOS_TABLE);
 
   const params = {
     TableName: TABLE,
@@ -50,11 +70,12 @@ app.post('/prestadores', function (req, res) {
       id : id,
       nome: nome, 
       endereco: endereco, 
-      planoName: planoName, 
       cpf:cpf,
       telefone:telefone, 
       rg: rg, 
-      dataNascimento: dataNascimento
+      dataNascimento: dataNascimento,
+      idConveniado:idConveniado,
+      nameConveniado: conveniado.Items[0].nomeFantasia,
     },
   };
 
@@ -79,7 +100,6 @@ app.put('/prestadores/:id', function (req, res) {
       id : id,
       nome: nome, 
       endereco: endereco, 
-      planoName: planoName, 
       cpf:cpf,
       telefone:telefone, 
       rg: rg, 
@@ -94,6 +114,37 @@ app.put('/prestadores/:id', function (req, res) {
     }
     res.status(201).json({ id });
   });
+})
+
+// Obter agendamentos endpoint
+app.get('/conveniados/:id/prestadores', function (req, res) {
+  
+  const params = {
+    TableName: TABLE,
+    FilterExpression: "#idConveniado = :idConveniado",
+    ExpressionAttributeNames:{
+        "#idConveniado": "idConveniado"
+    },
+    ExpressionAttributeValues: {
+        ":idConveniado": req.params.id
+    }
+  }
+
+  dynamoDb.scan(params, (error, result) => {
+    
+    if (error) {
+      console.log(error);
+      res.status(400).
+      json({ error: 'Não foi possivel obter prestadores do conveniado '+req.params.id, detail: error });
+    }
+   
+    if (result.Items) {
+      res.status(200).json(result.Items);
+    } else {
+      res.status(404).json({ error: "Prestadores Não encontrados",  result: result });
+    }
+  });
+
 })
 
 module.exports.handler = serverless(app);

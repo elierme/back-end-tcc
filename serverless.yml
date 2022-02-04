@@ -113,7 +113,7 @@ functions:
   listAgendamentosOfPrestadores:
     handler: agendamentos.handler
     events:
-      - http: 'GET /prestadpres/{id}/agendamentos'
+      - http: 'GET /prestadores/{id}/agendamentos'
   createAtendimentos:
     handler: atendimentos.handler
     events:
@@ -129,7 +129,7 @@ functions:
   listAtendimentosOfPrestadores:
     handler: atendimentos.handler
     events:
-      - http: 'GET /prestadpres/{id}/atendimentos'
+      - http: 'GET /prestadores/{id}/atendimentos'
   createConveniados:
     handler: conveniados.handler
     events:
@@ -146,6 +146,10 @@ functions:
     handler: prestadores.handler
     events:
       - http: 'GET /prestadores'
+  listPrestadoresOfConveniado:
+    handler: prestadores.handler
+    events:
+      - http: 'GET /conveniados/{id}/prestadores'
   
 
 resources:
