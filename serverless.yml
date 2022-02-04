@@ -73,6 +73,16 @@ custom:
       - us-west-2
       - Ref: AWS::AccountId
       - table/${self:custom.procedimentosTableName}
+  tokensTableName: '${self:service}-${self:provider.stage}-tokens'
+  tokensTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.tokensTableName}
   
   
 
@@ -99,6 +109,7 @@ provider:
         - ${self:custom.prestadoresTableArn}
         - ${self:custom.planosTableArn}
         - ${self:custom.procedimentosTableArn}
+        - ${self:custom.tokensTableArn}
   environment:
     ASSOCIADOS_TABLE: ${self:custom.associadosTableName}  
     AGENDAMENTOS_TABLE: ${self:custom.agendamentosTableName}
@@ -107,7 +118,7 @@ provider:
     PRESTADORES_TABLE: ${self:custom.prestadoresTableName}
     PLANOS_TABLE: ${self:custom.planosTableName}
     PROCEDIMENTOS_TABLE: ${self:custom.procedimentosTableName}
-
+    TOKENS_TABLE: ${self:custom.tokensTableName}
 
 
 
@@ -192,6 +203,10 @@ functions:
     handler: procedimentos.handler
     events:
       - http: 'GET /planos/{id}/procedimentos'
+  confirmationToken:
+    handler: tokens.handler
+    events:
+      - http: 'PUT /tokens/{id}'
   
 
 resources:

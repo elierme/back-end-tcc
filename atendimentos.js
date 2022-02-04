@@ -3,7 +3,10 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const app = express()
 const AWS = require('aws-sdk');
-const { randomUUID } = require('crypto'); 
+const { randomUUID } = require('crypto'); 	
+const moment = require("moment");
+
+AWS.config.update({region: 'us-west-2'});
 
 const TABLE = process.env.ATENDIMENTOS_TABLE;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -57,19 +60,19 @@ async function getTable(id, table){
 
 // Create atendimentos endpoint
 app.post('/atendimentos', async function (req, res) {
-  const { data, idAgendamento, longitude, latitude, idAssociado, idConveniado, idPrestador, idProcedimento, valor } = req.body;
+  const { idAgendamento, idAssociado, idConveniado, idPrestador, idProcedimento, valor } = req.body;
   const id = randomUUID();
 
   const associado = await getTable(idAssociado, process.env.ASSOCIADOS_TABLE);
   const conveniado = await getTable(idConveniado, process.env.CONVENIADOS_TABLE);
   const prestador = await getTable(idPrestador, process.env.PRESTADORES_TABLE);
-  const procedimento = await getTable(idProcedimento, process.env.PRESTADORES_TABLE);
+  const procedimento = await getTable(idProcedimento, process.env.PROCEDIMENTOS_TABLE);
 
   const params = {
     TableName: TABLE,
     Item: {
       id : id,
-      data: data, 
+      data: moment().format("DD/MM/YYYY hh:mm:ss"), 
       idAgendamento: idAgendamento,     
       idAssociado: idAssociado, 
       nameAssociado: associado.Items[0].nome,
@@ -81,7 +84,8 @@ app.post('/atendimentos', async function (req, res) {
       planoName: associado.Items[0].planoName,
       idProcedimento: idProcedimento,
       procedimentoName: procedimento.Items[0].nome,
-      valor: valor
+      valor: valor,
+      confirmado: false
     },
   };
 
@@ -90,8 +94,46 @@ app.post('/atendimentos', async function (req, res) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar atendimentos', detail: error });
     }
-    res.status(201).json({ data });
   });
+
+  const idToken = randomUUID();
+
+  const paramsToken = {
+    TableName: process.env.TOKENS_TABLE,
+    Item: {
+      id : idToken,
+      idAtendimento: id,
+      confirmado: false,
+    },
+  };
+
+  dynamoDb.put(paramsToken, (error, data) => {
+    if (error) {
+      console.log(error);
+      res.status(422).json({ error: 'Não foi possivel criar token de atendimento', detail: error });
+    }
+  });
+
+
+  // Create publish parameters
+  var paramsSNS = {
+    Message: 'Seu token de atendimento é '+idToken,
+    PhoneNumber: associado.Items[0].telefone,
+  };
+
+  // Create promise and SNS service object
+  var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(paramsSNS).promise();
+
+  // Handle promise's fulfilled/rejected states
+  publishTextPromise.then(
+    function(data) {
+      console.log("MessageID is " + data.MessageId);
+    }).catch(
+      function(err) {
+      console.error(err, err.stack);
+    });
+
+    res.status(201).json({ id: id });
 })
 
 

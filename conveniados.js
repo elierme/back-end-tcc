@@ -63,7 +63,7 @@ app.post('/conveniados', function (req, res) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar conveniados', detail: error });
     }
-    res.status(201).json({ data });
+    res.status(201).json({ id: id });
   });
 })
 
@@ -90,7 +90,7 @@ app.put('/conveniados/:id', function (req, res) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar conveniados', detail: error });
     }
-    res.status(201).json({ data });
+    res.status(200);
   });
 })
 

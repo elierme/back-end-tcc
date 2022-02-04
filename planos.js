@@ -18,8 +18,9 @@ app.use((req, res, next) => {
   
 });
 
+
 // Listar agendamentos endpoint
-app.get('/planos', function (req, res) {
+app.get('/planos',  function (req, res) {
   const params = {
     TableName: TABLE
   }

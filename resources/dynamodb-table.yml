@@ -146,3 +146,24 @@ Resources:
         -      
           AttributeName: idPlano
           KeyType: RANGE
+  TokensTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.tokensTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: S
+        -   
+          AttributeName: idAtendimento
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: idAtendimento
+          KeyType: RANGE

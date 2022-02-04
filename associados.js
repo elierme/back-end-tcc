@@ -96,8 +96,9 @@ app.post('/associados', function (req, res) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar associado', detail: error });
     }
-    res.status(201).json({ data });
+    res.status(201).json({ id: id });
   });
+  
 })
 
 
