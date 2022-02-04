@@ -104,3 +104,45 @@ Resources:
         -      
           AttributeName: cpf
           KeyType: RANGE
+  PlanosTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.planosTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: S
+        -   
+          AttributeName: nome
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: nome
+          KeyType: RANGE
+  ProcedimentosTable:
+    Type: 'AWS::DynamoDB::Table'            
+    Properties:
+      TableName: ${self:custom.procedimentosTableName}
+      ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1  
+      AttributeDefinitions:
+        -
+          AttributeName: id
+          AttributeType: S
+        -   
+          AttributeName: idPlano
+          AttributeType: S 
+      KeySchema:
+        -
+          AttributeName: id
+          KeyType: HASH
+        -      
+          AttributeName: idPlano
+          KeyType: RANGE

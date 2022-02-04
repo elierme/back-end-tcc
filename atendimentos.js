@@ -57,19 +57,20 @@ async function getTable(id, table){
 
 // Create atendimentos endpoint
 app.post('/atendimentos', async function (req, res) {
-  const { data, procedimento, idAssociado, idConveniado, idPrestador, valor } = req.body;
+  const { data, idAgendamento, longitude, latitude, idAssociado, idConveniado, idPrestador, idProcedimento, valor } = req.body;
   const id = randomUUID();
 
   const associado = await getTable(idAssociado, process.env.ASSOCIADOS_TABLE);
   const conveniado = await getTable(idConveniado, process.env.CONVENIADOS_TABLE);
   const prestador = await getTable(idPrestador, process.env.PRESTADORES_TABLE);
+  const procedimento = await getTable(idProcedimento, process.env.PRESTADORES_TABLE);
 
   const params = {
     TableName: TABLE,
     Item: {
       id : id,
       data: data, 
-      procedimento: procedimento,
+      idAgendamento: idAgendamento,     
       idAssociado: idAssociado, 
       nameAssociado: associado.Items[0].nome,
       idConveniado:idConveniado,
@@ -78,6 +79,8 @@ app.post('/atendimentos', async function (req, res) {
       namePrestador: prestador.Items[0].nome,
       idPlano: associado.Items[0].planoId,
       planoName: associado.Items[0].planoName,
+      idProcedimento: idProcedimento,
+      procedimentoName: procedimento.Items[0].nome,
       valor: valor
     },
   };

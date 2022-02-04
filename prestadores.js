@@ -89,7 +89,7 @@ app.post('/prestadores', function (req, res) {
 })
 
 
-// Create associado endpoint
+// Atualizar prestadores endpoint
 app.put('/prestadores/:id', function (req, res) {
   const { nome, endereco, planoName, cpf, telefone, rg, dataNascimento } = req.body;
   const id = req.params.id;

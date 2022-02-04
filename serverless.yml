@@ -53,6 +53,27 @@ custom:
       - us-west-2
       - Ref: AWS::AccountId
       - table/${self:custom.prestadoresTableName}
+  planosTableName: '${self:service}-${self:provider.stage}-planos'
+  planosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.planosTableName}
+  procedimentosTableName: '${self:service}-${self:provider.stage}-procedimentos'
+  procedimentosTableArn: # ARNs are addresses of deployed services in AWS space.
+    Fn::Join:
+    - ":"
+    - - arn
+      - aws
+      - dynamodb
+      - us-west-2
+      - Ref: AWS::AccountId
+      - table/${self:custom.procedimentosTableName}
+  
   
 
 provider:
@@ -76,12 +97,17 @@ provider:
         - ${self:custom.atendimentosTableArn}
         - ${self:custom.conveniadosTableArn}
         - ${self:custom.prestadoresTableArn}
+        - ${self:custom.planosTableArn}
+        - ${self:custom.procedimentosTableArn}
   environment:
     ASSOCIADOS_TABLE: ${self:custom.associadosTableName}  
     AGENDAMENTOS_TABLE: ${self:custom.agendamentosTableName}
     ATENDIMENTOS_TABLE: ${self:custom.atendimentosTableName}
     CONVENIADOS_TABLE: ${self:custom.conveniadosTableName}
     PRESTADORES_TABLE: ${self:custom.prestadoresTableName}
+    PLANOS_TABLE: ${self:custom.planosTableName}
+    PROCEDIMENTOS_TABLE: ${self:custom.procedimentosTableName}
+
 
 
 
@@ -134,6 +160,10 @@ functions:
     handler: conveniados.handler
     events:
       - http: 'POST /conveniados'
+  updateConveniados:
+    handler: conveniados.handler
+    events:
+      - http: 'PUT /conveniados/{id}'
   listConveniados:
     handler: conveniados.handler
     events:
@@ -142,6 +172,10 @@ functions:
     handler: prestadores.handler
     events:
       - http: 'POST /prestadores'
+  updatePrestadores:
+    handler: prestadores.handler
+    events:
+      - http: 'PUT /prestadores/{id}'    
   listPrestadores:
     handler: prestadores.handler
     events:
@@ -150,6 +184,14 @@ functions:
     handler: prestadores.handler
     events:
       - http: 'GET /conveniados/{id}/prestadores'
+  listPlanos:
+    handler: planos.handler
+    events:
+      - http: 'GET /planos'
+  listProcedimentosOfPlanos:
+    handler: procedimentos.handler
+    events:
+      - http: 'GET /planos/{id}/procedimentos'
   
 
 resources:

@@ -67,7 +67,7 @@ app.post('/conveniados', function (req, res) {
   });
 })
 
-
+// Atualizar conveniados endpoint
 app.put('/conveniados/:id', function (req, res) {
   const { nomeFantasia, razaoSocial, endereco, cnpj, telefone } = req.body;
   const id = req.params.id;
