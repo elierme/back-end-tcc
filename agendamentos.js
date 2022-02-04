@@ -121,4 +121,37 @@ app.get('/conveniados/:id/agendamentos', function (req, res) {
 
 })
 
+
+// Obter agendamentos endpoint
+app.get('/prestadores/:id/atendimentos', function (req, res) {
+  
+  const params = {
+    TableName: TABLE,
+    FilterExpression: "#idPrestador = :idPrestador",
+    ExpressionAttributeNames:{
+        "#idPrestador": "idPrestador"
+    },
+    ExpressionAttributeValues: {
+        ":idPrestador": req.params.id
+    }
+  }
+
+  dynamoDb.scan(params, (error, result) => {
+    
+    if (error) {
+      console.log(error);
+      res.status(400).
+      json({ error: 'Não foi possivel obter agendamentos do prestador '+req.params.id, detail: error });
+    }
+   
+    if (result.Items) {
+      res.status(200).json(result.Items);
+    } else {
+      res.status(404).json({ error: "Agendamentos Não encontrados",  result: result });
+    }
+  });
+
+})
+
+
 module.exports.handler = serverless(app);
