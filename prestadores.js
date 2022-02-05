@@ -74,7 +74,7 @@ app.post('/conveniados/:id/prestadores', async function (req, res) {
       telefone:telefone, 
       rg: rg, 
       dataNascimento: dataNascimento,
-      idConveniado:idConveniado,
+      idConveniado: req.params.id,
       nameConveniado: conveniado.Items[0].nomeFantasia,
     },
   };
@@ -84,7 +84,7 @@ app.post('/conveniados/:id/prestadores', async function (req, res) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar prestadores', detail: error });
     }
-    res.status(201).json({ data });
+    res.status(201).json({ id: id });
   });
 })
 
