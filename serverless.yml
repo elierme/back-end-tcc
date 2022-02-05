@@ -90,7 +90,7 @@ provider:
   lambdaHashingVersion: 20200924
   name: aws
   runtime: nodejs14.x
-  stage: homo
+  stage: prod
   region: us-west-2
   iamRoleStatements:
     - Effect: Allow
