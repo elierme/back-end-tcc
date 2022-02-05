@@ -5,7 +5,7 @@ const app = express()
 const AWS = require('aws-sdk');
 
 
-const TABLE = process.env.TOLKENS_TABLE;
+const TABLE = process.env.TOKENS_TABLE;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }));
@@ -41,56 +41,55 @@ app.put('/tokens/:id', async function (req, res) {
   const { latitude, longitude } = req.body;
 
   const token = await getTable(req.params.id, TABLE);
-  const atendimento = await getTable(req.params.id, process.env.ATENDIMENTOS_TABLE);
+  const atendimento = await getTable(token.Items[0].idAtendimento, process.env.ATENDIMENTOS_TABLE);
 
   if (token && atendimento) {
 
     const params = {
       TableName: TABLE,
-      id: req.params.id,
-      idAtendimento: atendimento[0].id,
-      confirmado: true,
+      Item: {
+        id: req.params.id,
+        idAtendimento: atendimento.Items[0].id,
+        confirmado: true,
+      }
     }
 
-    dynamoDb.put(params, (error, result) => {
+    dynamoDb.put(params, (error) => {
+      console.log("atualizando token");
+
       if (error) {
         console.log(error);
         res.status(400).json({ error: 'Não foi possivel atualizar token', detail: error });
       }      
     });
 
-    const paramsAtendiemnto = {
-      TableName: TABLE,
-      id: req.params.id,
-      idAtendimento: atendimento[0].id,
-      confirmado: true,
-    }
-
     var paramsAtendimentos = {
       TableName:process.env.ATENDIMENTOS_TABLE,
       Key:{
-          "id": atendimento[0].id,
-          "data": atendimento[0].data
+          "id": atendimento.Items[0].id,
+          "data": atendimento.Items[0].data
       },
       UpdateExpression: "set confirmado = :confirmado, longitude=:longitude, latitude=:latitude",
       ExpressionAttributeValues:{
           ":confirmado": true,
           ":latitude":latitude,
-          ":latitude":longitude
-      },
-      ReturnValues:"UPDATED_NEW"
+          ":longitude":longitude
+      }
   };
 
-    dynamoDb.update(paramsAtendimentos, (error, result) => {
+    dynamoDb.update(paramsAtendimentos, (error, data) => {
+      console.log("atualizando atendimentos");
       if (error) {
         console.log(error);
         res.status(304).json({ error: 'Não foi possivel atualizar token', detail: error });
-      }      
+      } 
+      
+      res.status(200).json({});
     });
 
-    res.status(200);
+    console.log("fializando");
   }else{
-    res.status(304).json({ error: "Token não encontrado",  result: result });
+    res.status(304).json({ error: "Token não encontrado" });
   }
 })
 

@@ -179,10 +179,6 @@ functions:
     handler: conveniados.handler
     events:
       - http: 'GET /conveniados'  
-  createPrestadores:
-    handler: prestadores.handler
-    events:
-      - http: 'POST /prestadores'
   updatePrestadores:
     handler: prestadores.handler
     events:
@@ -195,6 +191,10 @@ functions:
     handler: prestadores.handler
     events:
       - http: 'GET /conveniados/{id}/prestadores'
+  createPrestadoresOfConveniado:
+    handler: prestadores.handler
+    events:
+      - http: 'POST /conveniados/{id}/prestadores'
   listPlanos:
     handler: planos.handler
     events:

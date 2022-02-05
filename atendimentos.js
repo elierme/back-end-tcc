@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const app = express()
 const AWS = require('aws-sdk');
-const { randomUUID } = require('crypto'); 	
+const { randomUUID, randomBytes } = require('crypto'); 	
 const moment = require("moment");
 
 AWS.config.update({region: 'us-west-2'});
@@ -89,14 +89,14 @@ app.post('/atendimentos', async function (req, res) {
     },
   };
 
-  dynamoDb.put(params, (error, data) => {
+  dynamoDb.put(params, (error, result) => {
     if (error) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar atendimentos', detail: error });
     }
   });
 
-  const idToken = randomUUID();
+  const idToken = randomBytes(4).toString("hex");
 
   const paramsToken = {
     TableName: process.env.TOKENS_TABLE,
@@ -107,7 +107,7 @@ app.post('/atendimentos', async function (req, res) {
     },
   };
 
-  dynamoDb.put(paramsToken, (error, data) => {
+  dynamoDb.put(paramsToken, (error, result) => {
     if (error) {
       console.log(error);
       res.status(422).json({ error: 'Não foi possivel criar token de atendimento', detail: error });
@@ -116,16 +116,16 @@ app.post('/atendimentos', async function (req, res) {
 
 
   // Create publish parameters
-  var paramsSNS = {
-    Message: 'Seu token de atendimento é '+idToken,
+  const paramsSNS = {
+    Message: 'Seu token de atendimento e '+idToken,
     PhoneNumber: associado.Items[0].telefone,
   };
 
   // Create promise and SNS service object
-  var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(paramsSNS).promise();
+  const publishTextPromise = new AWS.SNS().publish(paramsSNS).promise();
 
   // Handle promise's fulfilled/rejected states
-  publishTextPromise.then(
+  await publishTextPromise.then(
     function(data) {
       console.log("MessageID is " + data.MessageId);
     }).catch(

@@ -58,11 +58,11 @@ async function getTable(id, table){
 
 
 // Create associado endpoint
-app.post('/prestadores', function (req, res) {
-  const { nome, endereco, planoName, cpf, telefone, rg, dataNascimento, idConveniado} = req.body;
+app.post('/conveniados/:id/prestadores', async function (req, res) {
+  const { nome, endereco, cpf, telefone, rg, dataNascimento} = req.body;
   const id = randomUUID();
 
-  const conveniado = await getTable(idConveniado, process.env.CONVENIADOS_TABLE);
+  const conveniado = await getTable(req.params.id, process.env.CONVENIADOS_TABLE);
 
   const params = {
     TableName: TABLE,
@@ -91,7 +91,7 @@ app.post('/prestadores', function (req, res) {
 
 // Atualizar prestadores endpoint
 app.put('/prestadores/:id', function (req, res) {
-  const { nome, endereco, planoName, cpf, telefone, rg, dataNascimento } = req.body;
+  const { nome, endereco, cpf, telefone, rg, dataNascimento } = req.body;
   const id = req.params.id;
 
   const params = {
